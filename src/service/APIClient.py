@@ -116,3 +116,32 @@ async def sessoes(configuracoes):
         print(f"Erro ao gerar o link WebSocket: {e}")
 
     return None  # Retorna None em caso de falha
+
+async def enviar_resposta(menor_caminho, configuracoes):
+    """
+    Função para enviar a solução via método HTTP POST.
+    Envia um json com a solução.
+    """
+    url = f"{configuracoes["API_URI"]}resposta"
+    json_data = {
+        "grupo": configuracoes["ID_GRUPO"],
+        "labirinto": configuracoes["ID_LABIRINTO"],
+        "vertices": menor_caminho
+    }
+
+    try:
+        # Realiza a requisição HTTP usando o método POST
+        data = await requisicao_http("POST", url, json_data)
+
+        # Verifica se a resposta contém dados válidos
+        if data and 'message' in data:
+            print(data['message']) # Indica sucesso
+        else:
+            raise ValueError("Resposta inválida do servidor: dados esperados não encontrados.")
+    except ValueError as ve:
+        print(f"Erro de valor: {ve}")
+    except Exception as e:
+        # Captura outros erros, como falhas na conexão ou no método requisicao_http
+        print(f"Erro ao enviar desafio grupo: {e}")
+
+    return None  # Indica falha

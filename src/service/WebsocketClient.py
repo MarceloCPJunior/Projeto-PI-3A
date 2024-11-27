@@ -1,26 +1,96 @@
+import math
+from asyncio.windows_events import INFINITE
+
 from src.conection.Websocket import gerar_conexao_websocket
-from src.utils.Utils import extrair_informacoes
+from src.model.Vertice import Vertice
+from src.model.VerticeDTO import VerticeDTO
+from src.utils.InfoUtils import extrair_informacoes
 
 
-async def comecar (configuracoes):
-    # Criar conexão
-    websocket = await gerar_conexao_websocket(configuracoes)
-    if websocket is None:
-        return  # Encerrar se não foi possível conectar
+async def solve_graph(websocket_conection):
+    graph = []
 
-    try:
-        # Reutilizar a conexão para receber mensagens
-        resposta = await websocket.recv()
-        print(f"Resposta recebida: {resposta}")
+    resposta = await websocket_conection.recv()
 
-        # Extrair informações
-        vertice_atual, tipo, adjacentes = extrair_informacoes(resposta)
+    verticeDTO = VerticeDTO(resposta)
+    verticeEntrada = Vertice(verticeDTO.vertice_atual, 0, None, 1)
+    verticeEntrada.visitado = True
+    graph.append(verticeEntrada)
 
+    print("Começando")
+    await dijkstra(websocket_conection, verticeDTO, graph, 0)
 
-        print(f"Vértice Atual: {vertice_atual}")
-        print(f"Tipo: {tipo}")
-        print(f"Adjacentes: {adjacentes}")
+    menor_caminho = gerar_menor_caminho(graph)
+    print("Retornando o menor caminho")
+    print(menor_caminho)
+    return menor_caminho
 
-    finally:
-        await websocket.close()
-        print("Conexão encerrada.")
+async def dijkstra(websocket_conection, verticeDTO, graph, pesoTotal):
+    print("Vertice atual: " + str(verticeDTO.vertice_atual))
+    verticeProximo = None
+    for i, adjacente in enumerate(verticeDTO.adjacentes):
+        vertice_novo = Vertice(
+            adjacente[0],
+            adjacente[1] + pesoTotal,
+            verticeDTO.vertice_atual,
+            verticeDTO.tipo
+        )
+        vertice_vertice = pegar_vertice_graph(graph, vertice_novo.vertice)
+
+        if vertice_vertice is None:
+            print('Adicionando vertice: ' + str(vertice_novo.vertice))
+            graph.append(vertice_novo)
+        else:
+            print("Verificando vertice: " + str(vertice_vertice.vertice))
+            if vertice_vertice.visitado:
+                print("vertice já visitado")
+                continue
+
+            indiceVertice = graph.index(vertice_vertice)
+            if(vertice_novo.menor_distancia < vertice_vertice.menor_distancia):
+                print("Atualizando valores do vertice: " + str(vertice_vertice.vertice))
+                vertice_novo.visitado = vertice_vertice.visitado
+                graph[indiceVertice] = vertice_novo
+
+        if verticeProximo is None:
+            verticeProximo = vertice_novo
+        elif vertice_novo.menor_distancia < verticeProximo.menor_distancia:
+            verticeProximo = vertice_novo
+
+    if verticeProximo:
+        print("Proximo Vertice: " + str(verticeProximo.vertice))
+        verticeProximo.visitado = True
+        await websocket_conection.send('ir: ' + str(verticeProximo.vertice))
+
+        resposta = await websocket_conection.recv()
+
+        vertice_destino = VerticeDTO(resposta)
+        vertice_vertice = pegar_vertice_graph(graph, vertice_destino.vertice_atual)
+        vertice_vertice.tipo = vertice_destino.tipo
+
+        await dijkstra(websocket_conection, vertice_destino, graph, verticeProximo.menor_distancia)
+
+def pegar_vertice_graph(graph, cd_vertice):
+    for vertice in graph:
+        if vertice.vertice == cd_vertice:
+            return vertice
+    return None
+
+def gerar_menor_caminho(graph):
+    menor_caminho = []
+    chegada = None
+    for i, vertice in enumerate(graph):
+        if vertice.tipo == 2:
+            chegada = vertice
+            break
+    entrada = False
+    vertice_atual = chegada
+    while entrada != True:
+        menor_caminho.append(vertice_atual.vertice)
+        if vertice_atual.tipo == 1:
+            entrada = True
+            break
+        vertice_atual = pegar_vertice_graph(graph, vertice_atual.vertice_anterior)
+
+    menor_caminho.reverse()
+    return menor_caminho

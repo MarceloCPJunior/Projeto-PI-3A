@@ -1,7 +1,7 @@
 {
     "API_URI": "http://localhost:8000/",
-    "WEBSOCKET_URI": "ws://localhost:8000/ws/edd1fadc-eaab-4ed6-b569-8a33f89b4adb/1",
-    "ID_GRUPO": "edd1fadc-eaab-4ed6-b569-8a33f89b4adb",
-    "NOME_GRUPO": "EU SABO 2",
+    "WEBSOCKET_URI": "ws://localhost:8000/ws/4caa4d08-2033-44ad-ad07-effeb39e6754/1",
+    "ID_GRUPO": "4caa4d08-2033-44ad-ad07-effeb39e6754",
+    "NOME_GRUPO": "EU SABO",
     "ID_LABIRINTO": 1
 }
