@@ -17,14 +17,16 @@ async def main():
     configuracoes = Config.carregar_configuracoes()
 
     if len(configuracoes["ID_GRUPO"]) == 0:
-        idGrupo = APIClient.registrar_grupo(configuracoes)
+        idGrupo = await APIClient.registrar_grupo(configuracoes)
         configuracoes["ID_GRUPO"] = idGrupo
         Config.salvar_configuracoes(configuracoes)
 
-    websocket_link = await gerar_link_websocket(configuracoes)
-    if websocket_link:
-        configuracoes["WEBSOCKET_URI"] = websocket_link
-        Config.salvar_configuracoes(configuracoes)
+    if len(configuracoes["WEBSOCKET_URI"]) == 0:
+        websocket_link = await gerar_link_websocket(configuracoes)
+
+        if websocket_link:
+            configuracoes["WEBSOCKET_URI"] = websocket_link
+            Config.salvar_configuracoes(configuracoes)
 
     websocket_conection = await gerar_conexao_websocket(configuracoes)
 
