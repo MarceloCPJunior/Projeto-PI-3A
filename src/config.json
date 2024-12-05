@@ -1,7 +1,7 @@
 {
-    "API_URI": "http://localhost:8000/",
-    "WEBSOCKET_URI": "ws://localhost:8000/ws/6b1524b6-b758-42d8-814a-22ea88fdeb01/1",
-    "ID_GRUPO": "6b1524b6-b758-42d8-814a-22ea88fdeb01",
-    "NOME_GRUPO": "EU SABO",
+    "API_URI": "https://apigrafos.onrender.com/",
+    "WEBSOCKET_URI": "",
+    "ID_GRUPO": "44e23ba9-838f-49bb-ade9-ed04ec6c28f5",
+    "NOME_GRUPO": "Todo dia um dolar 6.19 diferente",
     "ID_LABIRINTO": 1
 }

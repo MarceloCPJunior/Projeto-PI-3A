@@ -2,16 +2,16 @@ import asyncio
 import src.config.Config as Config
 from src.conection.Websocket import gerar_conexao_websocket
 from src.service import APIClient
-from src.service.APIClient import gerar_link_websocket, enviar_resposta
+from src.service.APIClient import gerar_link_websocket, enviar_resposta, listar_labirintos
 from src.service.WebsocketClient import solve_graph
 
 
 # [X] Resgistrar Grupo
 # [X] Listar Labirintos
 # [X] Gerar Link do WebSocket
-# [] Conectar ao WebSocket e Iniciar o Labirinto
-# [] Algoritmo Para Resolução do Labirinto
-# [] Finalizar Labirinto
+# [X] Conectar ao WebSocket e Iniciar o Labirinto
+# [X] Algoritmo Para Resolução do Labirinto
+# [X] Finalizar Labirinto
 
 async def main():
     configuracoes = Config.carregar_configuracoes()
@@ -29,6 +29,8 @@ async def main():
             Config.salvar_configuracoes(configuracoes)
 
     websocket_conection = await gerar_conexao_websocket(configuracoes)
+
+    labirintos = await listar_labirintos(configuracoes)
 
     menor_caminho = await solve_graph(websocket_conection)
     await websocket_conection.close()

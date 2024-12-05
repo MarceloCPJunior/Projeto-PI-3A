@@ -27,7 +27,7 @@ async def registrar_grupo(configuracoes):
 
 
 
-async def labirintos(configuracoes):
+async def listar_labirintos(configuracoes):
     """
     Função para buscar um labirinto específico pelo ID.
     Retorna os detalhes do labirinto caso encontrado, ou None se não for encontrado.
@@ -40,8 +40,8 @@ async def labirintos(configuracoes):
 
         # Verifica se a resposta contém dados válidos
         if data and 'labirintos' in data:
-            labirinto = next((l for l in data['labirintos'] if l.get('labirinto') == configuracoes["ID_LABIRINTO"]), None)
-            return labirinto
+            labirintos_numeros = [labirinto['labirinto'] for labirinto in data['labirintos']]
+            return labirintos_numeros
 
         # Se a chave 'labirintos' não estiver presente ou for inválida
         raise ValueError("Dados de labirintos não encontrados na resposta.")
